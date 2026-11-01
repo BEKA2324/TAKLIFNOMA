@@ -64,6 +64,16 @@ data/mehr.sqlite     mavjud ma’lumotlar bazasi
 
 VS Code sozlamalari `node_modules` va yig‘ilgan `public/build` ni Explorer’da yashiradi. Ular diskda saqlanadi.
 
+## Render’da bepul sinov
+
+[Render’da deploy qilish](https://render.com/deploy?repo=https://github.com/BEKA2324/TAKLIFNOMA)
+
+Repository’da `Dockerfile` va bepul reja uchun `render.yaml` bor. Render hisobingizni ulang, repository uchun Blueprint yarating va so‘ralganda `TELEGRAM_BOT_TOKEN` ni maxfiy muhit o‘zgaruvchisiga kiriting. Token `.env` yoki GitHub’ga yuborilmaydi. `RENDER_EXTERNAL_URL` avtomatik aniqlanib, botdagi havolalar ommaviy saytga yo‘naltiriladi. `GET /healthz` server holatini tekshiradi.
+
+Bu bepul sinov rejasi: 15 daqiqa kirish bo‘lmasa server uxlaydi, restart/deployda SQLite bazasi yo‘qoladi. Botning tashqi Telegram so‘rovlari serverni uyg‘oq saqlamaydi. Server uxlaganda eslatmalar ishlamaydi. Doimiy foydalanish uchun doim ishlaydigan server va disk kerak. `DATA_DIR` bazani saqlash katalogini belgilaydi; Render bepul sinovida u vaqtinchalik `/app/data`.
+
+Deploy ishga tushganda mahalliy bot jarayonini to‘xtating: bir token bilan ikkita long-polling jarayonini parallel ishlatmang. Windows kompyuterda Docker mavjud bo‘lmasa, konteyner buildini Render bajaradi. Node.js tekshiruvlari konteyner buildi tekshiruvi o‘rnini bosmaydi.
+
 ## Tezlik va tuzilma
 
 esbuild frontendni kichraytiradi, umumiy kodni ajratadi va Three.js’ni kapalaklar yoqilganda yuklaydi. Backend statik fayllarni xotirada keshlaydi, ETag orqali o‘zgarmagan faylni qayta uzatmaydi. SQLite so‘rovlari qayta foydalanish uchun oldindan tayyorlanadi. TypeScript xatolarni ishga tushirishdan oldin topadi; uning o‘zi animatsiya tezligini oshirmaydi.

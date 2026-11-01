@@ -1,9 +1,11 @@
 import { mkdir } from 'node:fs/promises';
 import { DatabaseSync } from 'node:sqlite';
 import { randomBytes } from 'node:crypto';
+import { join } from 'node:path';
 import type { InvitationInput, StoredInvitation, ResponseChoice } from '../shared/types.ts';
-await mkdir('data', { recursive: true });
-export const db = new DatabaseSync('data/mehr.sqlite');
+const dataDirectory = process.env.DATA_DIR || 'data';
+await mkdir(dataDirectory, { recursive: true });
+export const db = new DatabaseSync(join(dataDirectory, 'mehr.sqlite'));
 db.exec(`CREATE TABLE IF NOT EXISTS invitations(id TEXT PRIMARY KEY,secret TEXT,type TEXT,sender TEXT,recipient TEXT,title TEXT,message TEXT,place TEXT,date TEXT,response TEXT);
  CREATE TABLE IF NOT EXISTS subscriptions(invite TEXT,chat TEXT,day_sent INTEGER DEFAULT 0,hour_sent INTEGER DEFAULT 0,UNIQUE(invite,chat));
  CREATE TABLE IF NOT EXISTS settings(key TEXT PRIMARY KEY,value TEXT);`);

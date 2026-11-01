@@ -7,6 +7,10 @@ const port = Number(process.env.PORT || 3000);
 const server = http.createServer(async (req, res) => {
   try {
     const url = new URL(req.url || '/', 'http://localhost');
+    if (req.method === 'GET' && url.pathname === '/healthz') {
+      json(res, 200, { ok: true });
+      return;
+    }
     if (await handleApi(req, res, url)) return;
     if (req.method === 'GET' && (await serveStatic(url.pathname, res, req.headers))) return;
     json(res, 404, { error: 'Topilmadi' });

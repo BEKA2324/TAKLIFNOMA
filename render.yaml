@@ -1,0 +1,17 @@
+# Free trial deployment. SQLite data is temporary on Render's free filesystem.
+services:
+  - type: web
+    name: luma-taklifnoma
+    runtime: docker
+    plan: free
+    region: frankfurt
+    branch: main
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATA_DIR
+        value: /app/data
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false

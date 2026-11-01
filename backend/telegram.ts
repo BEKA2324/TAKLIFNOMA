@@ -3,6 +3,7 @@ import { invitationContent, creatorCredit } from '../shared/invitation-content.t
 import { formatDate } from '../shared/time.ts';
 import { db, findInvitationByCode } from './db.ts';
 import { renderPaper } from './card.ts';
+import { publicBaseUrl } from './config.ts';
 interface BotUpdate {
   update_id: number;
   message?: { chat: { id: number }; text?: string };
@@ -60,7 +61,7 @@ async function sendPaper(chat: number, item: StoredInvitation) {
         url: `https://www.google.com/maps/search/?api=1&query=${item.latitude},${item.longitude}`,
       },
     ]);
-  const base = process.env.BASE_URL || '';
+  const base = publicBaseUrl();
   if (base.startsWith('https://'))
     buttons.push([
       { text: '💌 Taklifnomani ochish', url: `${base.replace(/\/$/, '')}/?invite=${item.id}` },
@@ -138,7 +139,7 @@ export async function runBot() {
               );
               if (selected) {
                 const content = invitationContent[selected];
-                const base = (process.env.BASE_URL || 'http://localhost:3000').replace(/\/$/, '');
+                const base = publicBaseUrl();
                 const link = `${base}/?type=${selected}`;
                 await telegram('sendMessage', {
                   chat_id: m.chat.id,
