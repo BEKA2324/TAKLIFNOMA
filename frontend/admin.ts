@@ -21,6 +21,11 @@ async function refresh() {
       throw Error(data.error || 'Statistika yuklanmadi');
     }
     const stats = data as AnalyticsSummary;
+    const previous = stats.previousSnapshot;
+    element('previous-counts').hidden = !previous;
+    if (previous)
+      element('previous-counts').textContent =
+        `Ko‘chirishdan oldingi hisob: ${previous.visits} tashrif, ${previous.visitors} brauzer, ${previous.botUsers} bot foydalanuvchisi, ${previous.invitations} taklifnoma va ${previous.subscribers} obunachi. Eski tashriflar jami tashriflarga qo‘shilgan. Noyob brauzer va bot foydalanuvchilari yangi bazaga ulanishdan boshlab alohida sanaladi; eski shaxsiy ID’lar rasmda bo‘lmagani uchun birlashtirilmagan.`;
     const values: Record<string, number> = {
       online: stats.site.online,
       visits: stats.site.visits,

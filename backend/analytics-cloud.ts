@@ -3,6 +3,7 @@ export function cloudAnalyticsEnabled() {
   return Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SECRET_KEY);
 }
 export interface CloudSummary {
+  previousSnapshot?: AnalyticsSummary['previousSnapshot'];
   site: AnalyticsSummary['site'];
   bot: Pick<AnalyticsSummary['bot'], 'users' | 'today' | 'recent'>;
 }

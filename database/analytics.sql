@@ -7,6 +7,11 @@ create index if not exists luma_sessions_presence on public.luma_sessions(active
 create table if not exists public.luma_daily(day date primary key, views bigint not null default 0);
 create table if not exists public.luma_visitor_days(day date, visitor text, primary key(day,visitor));
 create table if not exists public.luma_bot_users(id text primary key, first_seen timestamptz not null, last_seen timestamptz not null);
+create table if not exists public.luma_analytics_archive(id text primary key, day date not null, data jsonb not null);
+alter table public.luma_analytics_archive enable row level security;
+revoke all on public.luma_analytics_archive from public,anon,authenticated;
+-- Idempotent aggregate backup supplied by the owner before migration.
+insert into public.luma_analytics_archive values('before-supabase','2026-11-01','{"visits":7,"visitors":3,"botUsers":2,"invitations":1,"subscribers":1}') on conflict(id) do nothing;
 alter table public.luma_visitors enable row level security;
 alter table public.luma_sessions enable row level security;
 alter table public.luma_daily enable row level security;
@@ -24,15 +29,16 @@ begin
  if p_action='summary' then
   return jsonb_build_object(
    'site',jsonb_build_object(
-    'visits',(select coalesce(sum(views),0) from public.luma_daily),
+    'visits',(select coalesce(sum(views),0) from public.luma_daily)+(select coalesce(sum((data->>'visits')::bigint),0) from public.luma_analytics_archive),
     'visitors',(select count(*) from public.luma_visitors),
-    'todayVisits',(select coalesce(sum(views),0) from public.luma_daily where day=d),
+    'todayVisits',(select coalesce(sum(views),0) from public.luma_daily where day=d)+(select coalesce(sum((data->>'visits')::bigint),0) from public.luma_analytics_archive where day=d),
     'todayVisitors',(select count(*) from public.luma_visitor_days where day=d),
     'online',(select count(distinct visitor) from public.luma_sessions where active and last_seen>t-interval '90 seconds')),
    'bot',jsonb_build_object(
     'users',(select count(*) from public.luma_bot_users),
     'today',(select count(*) from public.luma_bot_users where last_seen>=(d::timestamp at time zone 'Asia/Tashkent')),
-    'recent',(select count(*) from public.luma_bot_users where last_seen>t-interval '24 hours')));
+    'recent',(select count(*) from public.luma_bot_users where last_seen>t-interval '24 hours')),
+   'previousSnapshot',(select data from public.luma_analytics_archive where id='before-supabase'));
  elsif p_action='bot' then
   if p_visitor !~ '^[0-9]+$' then raise exception 'Invalid bot user'; end if;
   insert into public.luma_bot_users values(p_visitor,t,t) on conflict(id) do update set last_seen=excluded.last_seen;

@@ -58,6 +58,7 @@ export async function analyticsSummary(): Promise<AnalyticsSummary> {
     try {
       const remote = await cloudAnalytics<CloudSummary>('summary');
       summary.site = remote.site;
+      summary.previousSnapshot = remote.previousSnapshot;
       summary.bot = { ...summary.bot, ...remote.bot };
     } catch {
       throw new ApiError('Doimiy statistika bazasi vaqtincha ishlamayapti', 503);
