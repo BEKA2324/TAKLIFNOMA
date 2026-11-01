@@ -5,11 +5,13 @@ import { validateInvitation } from './validation.ts';
 import { getBotName } from './telegram.ts';
 import { findPlaces } from './places.ts';
 import { renderPaper } from './card.ts';
+import { handleAnalytics } from './analytics.ts';
 export async function handleApi(
   req: IncomingMessage,
   res: ServerResponse,
   url: URL,
 ): Promise<boolean> {
+  if (await handleAnalytics(req, res, url)) return true;
   if (req.method === 'GET' && url.pathname === '/api/config') {
     json(res, 200, { botName: getBotName() });
     return true;

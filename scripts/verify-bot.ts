@@ -62,6 +62,7 @@ const child = spawn(
       ...process.env,
       PORT: '0',
       TELEGRAM_BOT_TOKEN: 'test-only',
+      ADMIN_TELEGRAM_ID: '12345',
       TEST_INVITE: id,
       TEST_RECEIPT: receipt,
     },

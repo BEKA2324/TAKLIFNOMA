@@ -15,6 +15,7 @@ export async function serveStatic(
 ): Promise<boolean> {
   const assets: Record<string, [string, string]> = {
     '/': ['index.html', 'text/html; charset=utf-8'],
+    '/admin': ['admin.html', 'text/html; charset=utf-8'],
     '/assets/butterfly.glb': ['assets/butterfly.glb', 'model/gltf-binary'],
     '/assets/pink-flowers.jpg': ['assets/pink-flowers.jpg', 'image/jpeg'],
   };

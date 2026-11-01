@@ -7,6 +7,8 @@ let delivered = false;
 let photos = 0;
 let menuChecked = false;
 let choiceChecked = false;
+let statsChecked = false;
+let idChecked = false;
 const expectedTypes: InvitationType[] = ['apology', 'date', 'proposal', 'custom'];
 const reply = (result: unknown) =>
   new Response(JSON.stringify({ ok: true, result }), {
@@ -22,6 +24,8 @@ globalThis.fetch = async (url, options) => {
       return reply(
         [
           '/start',
+          '/id',
+          '/stats',
           '/proposal',
           ...[id, ...['0', '1', '2'].map((s) => id.slice(0, -1) + s)].map(
             (code) => '/start ' + code,
@@ -51,7 +55,7 @@ globalThis.fetch = async (url, options) => {
     assert.equal(JSON.parse(markup).inline_keyboard[0][0].text, '📍 ' + content.mapLabel);
     photos++;
     if (photos < 4) return reply({ message_id: photos + 2 });
-    assert(menuChecked && choiceChecked);
+    assert(menuChecked && choiceChecked && statsChecked && idChecked);
     assert(process.env.TEST_RECEIPT);
     await writeFile(
       process.env.TEST_RECEIPT,
@@ -61,6 +65,11 @@ globalThis.fetch = async (url, options) => {
   }
   if (method === 'sendMessage') {
     const data = JSON.parse(String(options?.body));
+    if (data.text.includes('Telegram ID: 12345')) idChecked = true;
+    if (data.text.includes('Luma statistikasi')) {
+      assert(data.text.includes('Bot foydalanuvchilari: 1'));
+      statsChecked = true;
+    }
     if (data.reply_markup?.keyboard) {
       assert(
         expectedTypes.every((type) =>

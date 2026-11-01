@@ -78,6 +78,16 @@ Deploy ishga tushganda mahalliy bot jarayonini to‘xtating: bir token bilan ikk
 
 esbuild frontendni kichraytiradi, umumiy kodni ajratadi va Three.js’ni kapalaklar yoqilganda yuklaydi. Backend statik fayllarni xotirada keshlaydi, ETag orqali o‘zgarmagan faylni qayta uzatmaydi. SQLite so‘rovlari qayta foydalanish uchun oldindan tayyorlanadi. TypeScript xatolarni ishga tushirishdan oldin topadi; uning o‘zi animatsiya tezligini oshirmaydi.
 
+## Statistika
+
+Saytning `/admin` sahifasida jami sahifa ochilishlari, cookie bo‘yicha alohida brauzerlar, bugungi tashriflar, so‘nggi 90 soniyada faol brauzerlar, taklifnomalar va bot foydalanuvchilari ko‘rsatiladi. Bir brauzerning bir nechta oynasi faol brauzerlar hisobida takrorlanmaydi. Raqamlar taxminiy: cookie o‘chirish, boshqa qurilma yoki boshqa brauzer yangi tashrifchi sifatida hisoblanadi. Shaxsiy IP/manzil yoki foydalanuvchi ismi statistikada saqlanmaydi.
+
+`ADMIN_TOKEN` serverdagi admin kaliti. Lokal kalit `.env` faylida; Render uni `render.yaml` orqali avtomatik yaratadi. Render xizmatining **Environment** bo‘limidan kalitni oling va `/admin` sahifasiga kiriting. Kalit URL yoki GitHub’ga yozilmaydi, brauzerda faqat joriy sahifa xotirasida turadi. Panel 15 soniyada yangilanadi.
+
+Botga `/id` yozib Telegram ID’ingizni oling. Uni Render yoki `.env` dagi `ADMIN_TELEGRAM_ID` ga kiriting va serverni qayta ishga tushiring. Shunda faqat siz `/stats` buyrug‘i bilan statistikani olasiz. Bot foydalanuvchilari — shaxsiy chatda botga yozganlar; “bugun/24 soatda faol” — xabar yuborganlar. Telegram onlayn holati aniqlanmaydi. Avvalgi foydalanuvchilar qayta yozmaguncha hisobga kirmaydi.
+
+Hisoblar funksiya yoqilgan paytdan boshlanadi va SQLite’da saqlanadi. Render’ning bepul rejasida deploy/restart bilan baza va statistika ham o‘chishi mumkin.
+
 ## Telegram va taklifnomalar
 
 `.env.example` ni `.env` nomi bilan nusxalang, BotFather tokenini `TELEGRAM_BOT_TOKEN` ga kiriting. `.env` Git’ga kiritilmaydi. Bitta token bilan bitta bot jarayonini ishlating; oldingi webhook o‘chirilgan bo‘lsin.

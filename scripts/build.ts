@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 await build({
   absWorkingDir: fileURLToPath(new URL('../', import.meta.url)),
-  entryPoints: ['frontend/app.ts', 'frontend/effects.ts'],
+  entryPoints: ['frontend/app.ts', 'frontend/effects.ts', 'frontend/admin.ts'],
   outdir: 'public/build',
   bundle: true,
   splitting: true,

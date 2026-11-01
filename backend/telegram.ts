@@ -4,6 +4,7 @@ import { formatDate } from '../shared/time.ts';
 import { db, findInvitationByCode } from './db.ts';
 import { renderPaper } from './card.ts';
 import { publicBaseUrl } from './config.ts';
+import { recordBotUser, analyticsSummary } from './analytics.ts';
 interface BotUpdate {
   update_id: number;
   message?: { chat: { id: number }; text?: string };
@@ -115,7 +116,24 @@ export async function runBot() {
       for (const update of updates) {
         try {
           const m = update.message;
+          if (m && m.chat.id > 0) recordBotUser(m.chat.id);
           if (m?.text) {
+            if (m.text === '/id') {
+              await send(m.chat.id, `Telegram ID: ${m.chat.id}\n\n${creatorCredit}`);
+              continue;
+            }
+            if (m.text === '/stats') {
+              if (String(m.chat.id) !== process.env.ADMIN_TELEGRAM_ID)
+                await send(m.chat.id, 'Statistika faqat sayt egasiga ochiq.');
+              else {
+                const stats = analyticsSummary();
+                await send(
+                  m.chat.id,
+                  `📊 Luma statistikasi\n\nSaytda hozir: ${stats.site.online}\nJami tashriflar: ${stats.site.visits}\nAlohida brauzerlar: ${stats.site.visitors}\nBugungi tashriflar: ${stats.site.todayVisits}\n\nBot foydalanuvchilari: ${stats.bot.users}\nBotda bugun faol: ${stats.bot.today}\nOxirgi 24 soatda faol: ${stats.bot.recent}\nEslatma obunachilari: ${stats.bot.subscribers}\n\nBotdagi faollik xabarlar bo‘yicha; Telegram onlayn holati emas.\n${creatorCredit}`,
+                );
+              }
+              continue;
+            }
             const code = m.text.match(/^\/start(?:@\w+)?\s+([a-f0-9]+)$/)?.[1];
             const item = code ? findInvitationByCode(code) : undefined;
             if (item) {
@@ -174,9 +192,10 @@ export async function runBot() {
           }
         } catch {
           console.error('Bot xabarini qayta ishlashda xatolik.');
+        } finally {
+          offset = update.update_id + 1;
+          db.prepare("INSERT OR REPLACE INTO settings VALUES('offset',?)").run(String(offset));
         }
-        offset = update.update_id + 1;
-        db.prepare("INSERT OR REPLACE INTO settings VALUES('offset',?)").run(String(offset));
       }
       await reminders();
     } catch {

@@ -20,7 +20,12 @@ const child = spawn(
   [fileURLToPath(new URL('../backend/server.ts', import.meta.url))],
   {
     cwd: temp,
-    env: { ...process.env, PORT: String(port), TELEGRAM_BOT_TOKEN: '' },
+    env: {
+      ...process.env,
+      PORT: String(port),
+      TELEGRAM_BOT_TOKEN: '',
+      ADMIN_TOKEN: 'test-admin-key',
+    },
     stdio: 'ignore',
   },
 );
@@ -36,6 +41,48 @@ try {
     }
   }
   assert(ready, 'Server starts');
+  assert.equal((await fetch(base + '/api/admin/stats')).status, 401);
+  assert.equal(
+    (await fetch(base + '/api/admin/stats', { headers: { authorization: 'Bearer wrong' } })).status,
+    401,
+  );
+  assert.equal((await fetch(base + '/admin')).status, 200);
+  const stats = async () =>
+    await (
+      await fetch(base + '/api/admin/stats', {
+        headers: { authorization: 'Bearer test-admin-key' },
+      })
+    ).json();
+  const event = async (session: string, action: string, cookie = '') =>
+    await fetch(base + '/api/analytics', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(cookie ? { cookie } : {}) },
+      body: JSON.stringify({ session, action }),
+    });
+  const sessionA = 'a'.repeat(32),
+    sessionB = 'b'.repeat(32),
+    sessionC = 'c'.repeat(32);
+  const firstView = await event(sessionA, 'view');
+  const cookie = firstView.headers.get('set-cookie')!.split(';')[0];
+  await event(sessionA, 'view', cookie);
+  await event(sessionB, 'view', cookie);
+  let metrics = await stats();
+  assert.equal(metrics.site.visits, 2);
+  assert.equal(metrics.site.visitors, 1);
+  assert.equal(metrics.site.online, 1);
+  assert.equal(metrics.site.todayVisits, 2);
+  assert.equal(metrics.site.todayVisitors, 1);
+  await event(sessionA, 'leave', cookie);
+  assert.equal((await stats()).site.online, 1);
+  await event(sessionB, 'leave', cookie);
+  assert.equal((await stats()).site.online, 0);
+  await event(sessionC, 'view');
+  metrics = await stats();
+  assert.equal(metrics.site.visitors, 2);
+  assert.equal(metrics.site.visits, 3);
+  console.log(
+    'PASS: private analytics, repeat-view deduplication, multi-tab presence, leave events and distinct visitors.',
+  );
   for (const path of ['/', '/build/app.js', '/build/effects.js', '/build/app.css'])
     assert.equal((await fetch(base + path)).status, 200, path);
   const asset = await fetch(base + '/assets/butterfly.glb');

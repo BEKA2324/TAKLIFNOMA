@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Luma — statistika</title>
+    <link rel="stylesheet" href="/build/admin.css" />
+  </head>
+  <body>
+    <main>
+      <header><a href="/">luma ✦</a><span>BEKA · boshqaruv</span></header>
+      <h1>Sayt va bot statistikasi</h1>
+      <p class="muted">
+        Saytdagi faollik 90 soniyalik oynada hisoblanadi. Bugungi hisoblar Toshkent vaqti bilan.
+      </p>
+      <form id="admin-login">
+        <label
+          >Admin kaliti<input
+            id="admin-token"
+            type="password"
+            autocomplete="current-password"
+            placeholder="ADMIN_TOKEN"
+            required /></label
+        ><button>Kirish ↗</button>
+      </form>
+      <p id="admin-status" role="status"></p>
+      <section id="admin-dashboard" hidden>
+        <div class="section-title">
+          <h2>Sayt</h2>
+          <button id="logout" type="button">Chiqish</button>
+        </div>
+        <div class="metrics">
+          <article>
+            <span>Hozir saytda</span><strong id="online">0</strong
+            ><small>Faol brauzerlar · so‘nggi 90 soniya</small>
+          </article>
+          <article>
+            <span>Jami tashriflar</span><strong id="visits">0</strong
+            ><small>Sahifa ochilishlari</small>
+          </article>
+          <article>
+            <span>Alohida brauzerlar</span><strong id="visitors">0</strong
+            ><small>Cookie bo‘yicha taxminiy hisob</small>
+          </article>
+          <article>
+            <span>Bugungi tashriflar</span><strong id="today-visits">0</strong
+            ><small>Sahifa ochilishlari</small>
+          </article>
+          <article>
+            <span>Bugungi brauzerlar</span><strong id="today-visitors">0</strong
+            ><small>Bugun kirgan alohida brauzerlar</small>
+          </article>
+          <article>
+            <span>Taklifnomalar</span><strong id="invitations">0</strong
+            ><small>Yaratilgan maktublar</small>
+          </article>
+        </div>
+        <h2>Telegram bot</h2>
+        <div class="metrics">
+          <article>
+            <span>Jami foydalanuvchilar</span><strong id="bot-users">0</strong
+            ><small>Botga yozgan alohida shaxsiy chatlar</small>
+          </article>
+          <article>
+            <span>Bugun faol</span><strong id="bot-today">0</strong
+            ><small>Bugun xabar yuborganlar</small>
+          </article>
+          <article>
+            <span>Oxirgi 24 soatda</span><strong id="bot-recent">0</strong
+            ><small>Xabar yuborganlar · onlayn holati emas</small>
+          </article>
+          <article>
+            <span>Eslatma obunachilari</span><strong id="bot-subscribers">0</strong
+            ><small>Alohida chatlar</small>
+          </article>
+        </div>
+        <p class="muted">
+          Hisoblar statistika yoqilgan paytdan boshlanadi. Cookie o‘chirilsa yoki boshqa brauzer
+          ishlatilsa, yangi tashrifchi deb hisoblanadi. Bepul Render’da restart yoki deploy bazani,
+          shu jumladan statistikani tozalaydi.
+        </p>
+      </section>
+    </main>
+    <script type="module" src="/build/admin.js"></script>
+  </body>
+</html>
