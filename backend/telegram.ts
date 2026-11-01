@@ -4,6 +4,7 @@ import { formatDate } from '../shared/time.ts';
 import { db, findInvitationByCode } from './db.ts';
 import { renderPaper } from './card.ts';
 import { publicBaseUrl } from './config.ts';
+import { navigation, websiteButton, botIcons } from './bot-menu.ts';
 import { recordBotUser, analyticsSummary } from './analytics.ts';
 interface BotUpdate {
   update_id: number;
@@ -37,7 +38,17 @@ async function telegram<T>(
     signal: AbortSignal.timeout(35000),
   });
   const result = (await r.json()) as { ok: boolean; result: T };
-  if (!result.ok) throw new Error('Telegram request failed');
+  if (!result.ok) {
+    if (!multipart && /"(?:icon_custom_emoji_id|custom_emoji_id)"/.test(JSON.stringify(data))) {
+      const plain = JSON.parse(
+        JSON.stringify(data, (key, value) =>
+          ['icon_custom_emoji_id', 'entities'].includes(key) ? undefined : value,
+        ),
+      ) as Record<string, unknown>;
+      return telegram<T>(method, plain);
+    }
+    throw new Error('Telegram request failed');
+  }
   return result.result;
 }
 const send = (chat_id: string | number, text: string) => telegram('sendMessage', { chat_id, text });
@@ -103,6 +114,13 @@ export async function runBot() {
     console.error('Bot tokenini yoki internetni tekshiring.');
     return;
   }
+  try {
+    await telegram('setChatMenuButton', {
+      menu_button: { type: 'web_app', text: 'Saytga kirish', web_app: { url: publicBaseUrl() } },
+    });
+  } catch {
+    console.error('Bot menyu tugmasi sozlanmadi; xabar ostidagi sayt tugmasi ishlaydi.');
+  }
   let offset = Number(
     db.prepare("SELECT value FROM settings WHERE key='offset'").get()?.value || 0,
   );
@@ -161,36 +179,39 @@ export async function runBot() {
                 const link = `${base}/?type=${selected}`;
                 await telegram('sendMessage', {
                   chat_id: m.chat.id,
-                  text: `${content.icon} ${content.label}\n\n“Saytga kirish” tugmasini bosing, ism va matnni to‘ldiring. So‘ng “Botdan maktubni olish”ni bosing — shu turdagi PNG maktubni yuboraman.\n\n${creatorCredit}`,
-                  reply_markup: { inline_keyboard: [[{ text: '🌐 Saytga kirish', url: link }]] },
+                  text: `${botIcons[selected].emoji} ${content.label}\n\n“Saytga kirish” tugmasini bosing, ism va matnni to‘ldiring. So‘ng “Botdan maktubni olish”ni bosing — shu turdagi PNG maktubni yuboraman.\n\n${creatorCredit}`,
+                  entities: [
+                    {
+                      type: 'custom_emoji',
+                      offset: 0,
+                      length: botIcons[selected].emoji.length,
+                      custom_emoji_id: botIcons[selected].id,
+                    },
+                  ],
+                  reply_markup: { inline_keyboard: [[websiteButton(link)]] },
                 });
-              } else
+              } else {
+                if (/^\/start(?:@\w+)?$/.test(m.text)) {
+                  await telegram('sendMessage', {
+                    chat_id: m.chat.id,
+                    text: 'Menyu yangilandi ✦ Saytni quyidagi tugma yoki yozish maydoni yonidagi “Saytga kirish” orqali oching.',
+                    reply_markup: navigation('keyboard'),
+                  });
+                }
                 await telegram('sendMessage', {
                   chat_id: m.chat.id,
-                  text: `Luma’ga xush kelibsiz 💌\n\n“Saytga kirish” tugmasi orqali taklifnoma yarating yoki pastdan maktub turini tanlang. Saytda to‘ldirib, tayyor qog‘oz maktubni botdan olasiz.\n\n/stop — eslatmalarni o‘chirish\n\n${creatorCredit}`,
-                  reply_markup: {
-                    inline_keyboard: [
-                      [{ text: '🌐 Saytga kirish', url: publicBaseUrl() }],
-                      [
-                        { text: invitationContent.date.menu, url: publicBaseUrl() + '/?type=date' },
-                        {
-                          text: invitationContent.proposal.menu,
-                          url: publicBaseUrl() + '/?type=proposal',
-                        },
-                      ],
-                      [
-                        {
-                          text: invitationContent.apology.menu,
-                          url: publicBaseUrl() + '/?type=apology',
-                        },
-                        {
-                          text: invitationContent.custom.menu,
-                          url: publicBaseUrl() + '/?type=custom',
-                        },
-                      ],
-                    ],
-                  },
+                  text: `❤️ Luma’ga xush kelibsiz\n\n“Saytga kirish” tugmasi orqali taklifnoma yarating yoki pastdan maktub turini tanlang. Saytda to‘ldirib, tayyor qog‘oz maktubni botdan olasiz.\n\n/stop — eslatmalarni o‘chirish\n\n${creatorCredit}`,
+                  entities: [
+                    {
+                      type: 'custom_emoji',
+                      offset: 0,
+                      length: 2,
+                      custom_emoji_id: botIcons.date.id,
+                    },
+                  ],
+                  reply_markup: navigation('inline'),
                 });
+              }
             }
           }
         } catch {

@@ -9,6 +9,7 @@ let menuChecked = false;
 let choiceChecked = false;
 let statsChecked = false;
 let idChecked = false;
+let persistentMenuChecked = false;
 const expectedTypes: InvitationType[] = ['apology', 'date', 'proposal', 'custom'];
 const reply = (result: unknown) =>
   new Response(JSON.stringify({ ok: true, result }), {
@@ -17,6 +18,13 @@ const reply = (result: unknown) =>
 globalThis.fetch = async (url, options) => {
   const method = String(url).split('/').at(-1);
   if (method === 'getMe') return reply({ username: 'mehr_test_bot' });
+  if (method === 'setChatMenuButton') {
+    const data = JSON.parse(String(options?.body));
+    assert.equal(data.menu_button.text, 'Saytga kirish');
+    assert.equal(data.menu_button.type, 'web_app');
+    assert(data.menu_button.web_app.url.startsWith('https://'));
+    return reply(true);
+  }
   if (method === 'getUpdates') {
     if (!delivered) {
       delivered = true;
@@ -55,7 +63,7 @@ globalThis.fetch = async (url, options) => {
     assert.equal(JSON.parse(markup).inline_keyboard[0][0].text, '📍 ' + content.mapLabel);
     photos++;
     if (photos < 4) return reply({ message_id: photos + 2 });
-    assert(menuChecked && choiceChecked && statsChecked && idChecked);
+    assert(menuChecked && choiceChecked && statsChecked && idChecked && persistentMenuChecked);
     assert(process.env.TEST_RECEIPT);
     await writeFile(
       process.env.TEST_RECEIPT,
@@ -65,6 +73,13 @@ globalThis.fetch = async (url, options) => {
   }
   if (method === 'sendMessage') {
     const data = JSON.parse(String(options?.body));
+    if (data.reply_markup?.keyboard) {
+      assert(data.reply_markup.is_persistent);
+      assert.equal(data.reply_markup.keyboard[0][0].text, 'Saytga kirish');
+      assert(data.reply_markup.keyboard[0][0].web_app.url.startsWith('https://'));
+      assert(data.reply_markup.keyboard[0][0].icon_custom_emoji_id);
+      persistentMenuChecked = true;
+    }
     if (data.text.includes('Telegram ID: 12345')) idChecked = true;
     if (data.text.includes('Luma statistikasi')) {
       assert(data.text.includes('Bot foydalanuvchilari: 1'));
@@ -73,11 +88,13 @@ globalThis.fetch = async (url, options) => {
     if (data.reply_markup?.inline_keyboard?.length === 3) {
       assert(
         expectedTypes.every((type) =>
-          JSON.stringify(data.reply_markup.inline_keyboard).includes(invitationContent[type].menu),
+          JSON.stringify(data.reply_markup.inline_keyboard).includes('?type=' + type),
         ),
       );
       assert(data.text.includes(creatorCredit));
-      assert.equal(data.reply_markup.inline_keyboard[0][0].text, '🌐 Saytga kirish');
+      assert.equal(data.reply_markup.inline_keyboard[0][0].text, 'Saytga kirish');
+      assert(data.reply_markup.inline_keyboard[0][0].icon_custom_emoji_id);
+      assert.equal(data.entities[0].type, 'custom_emoji');
       assert(data.reply_markup.inline_keyboard[0][0].url.startsWith('https://'));
       assert(!data.text.includes('https://'));
       menuChecked = true;
@@ -89,7 +106,7 @@ globalThis.fetch = async (url, options) => {
       assert(data.text.includes(invitationContent.proposal.label));
       assert(data.text.includes(creatorCredit));
       assert(!data.text.includes('https://'));
-      assert.equal(data.reply_markup.inline_keyboard[0][0].text, '🌐 Saytga kirish');
+      assert.equal(data.reply_markup.inline_keyboard[0][0].text, 'Saytga kirish');
       choiceChecked = true;
     }
     return reply({ message_id: 3 });
