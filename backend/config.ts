@@ -1,7 +1,6 @@
 export function publicBaseUrl(): string {
+  const configured = process.env.RENDER_EXTERNAL_URL || process.env.BASE_URL;
   return (
-    process.env.RENDER_EXTERNAL_URL ||
-    process.env.BASE_URL ||
-    'http://localhost:3000'
+    configured?.startsWith('https://') ? configured : 'https://luma-taklifnoma.onrender.com'
   ).replace(/\/$/, '');
 }

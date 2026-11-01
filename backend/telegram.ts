@@ -161,31 +161,34 @@ export async function runBot() {
                 const link = `${base}/?type=${selected}`;
                 await telegram('sendMessage', {
                   chat_id: m.chat.id,
-                  text: `${content.icon} ${content.label}\n\nQuyidagi sahifada ism va matnni to‘ldiring. So‘ng “Botdan maktubni olish”ni bosing — shu turdagi PNG maktubni yuboraman.\n\n${link}\n\n${creatorCredit}`,
-                  ...(base.startsWith('https://')
-                    ? {
-                        reply_markup: {
-                          inline_keyboard: [[{ text: content.label + ' yaratish ↗', url: link }]],
-                        },
-                      }
-                    : {}),
+                  text: `${content.icon} ${content.label}\n\n“Saytga kirish” tugmasini bosing, ism va matnni to‘ldiring. So‘ng “Botdan maktubni olish”ni bosing — shu turdagi PNG maktubni yuboraman.\n\n${creatorCredit}`,
+                  reply_markup: { inline_keyboard: [[{ text: '🌐 Saytga kirish', url: link }]] },
                 });
               } else
                 await telegram('sendMessage', {
                   chat_id: m.chat.id,
-                  text: `Luma’ga xush kelibsiz 💌\n\nQanday maktub yaratamiz?\n♡ Uchrashuv\n💍 Turmush taklifi\n🌿 Kechirim maktubi\n✦ Boshqa taklifnoma\n\nTurini tanlang, saytda to‘ldiring va botdan qog‘oz maktubni oling.\n/stop — eslatmalarni o‘chirish\n\n${creatorCredit}`,
+                  text: `Luma’ga xush kelibsiz 💌\n\n“Saytga kirish” tugmasi orqali taklifnoma yarating yoki pastdan maktub turini tanlang. Saytda to‘ldirib, tayyor qog‘oz maktubni botdan olasiz.\n\n/stop — eslatmalarni o‘chirish\n\n${creatorCredit}`,
                   reply_markup: {
-                    keyboard: [
+                    inline_keyboard: [
+                      [{ text: '🌐 Saytga kirish', url: publicBaseUrl() }],
                       [
-                        { text: invitationContent.date.menu },
-                        { text: invitationContent.proposal.menu },
+                        { text: invitationContent.date.menu, url: publicBaseUrl() + '/?type=date' },
+                        {
+                          text: invitationContent.proposal.menu,
+                          url: publicBaseUrl() + '/?type=proposal',
+                        },
                       ],
                       [
-                        { text: invitationContent.apology.menu },
-                        { text: invitationContent.custom.menu },
+                        {
+                          text: invitationContent.apology.menu,
+                          url: publicBaseUrl() + '/?type=apology',
+                        },
+                        {
+                          text: invitationContent.custom.menu,
+                          url: publicBaseUrl() + '/?type=custom',
+                        },
                       ],
                     ],
-                    resize_keyboard: true,
                   },
                 });
             }

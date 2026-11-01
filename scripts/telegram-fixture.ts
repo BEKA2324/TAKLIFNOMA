@@ -70,18 +70,26 @@ globalThis.fetch = async (url, options) => {
       assert(data.text.includes('Bot foydalanuvchilari: 1'));
       statsChecked = true;
     }
-    if (data.reply_markup?.keyboard) {
+    if (data.reply_markup?.inline_keyboard?.length === 3) {
       assert(
         expectedTypes.every((type) =>
-          JSON.stringify(data.reply_markup.keyboard).includes(invitationContent[type].menu),
+          JSON.stringify(data.reply_markup.inline_keyboard).includes(invitationContent[type].menu),
         ),
       );
       assert(data.text.includes(creatorCredit));
+      assert.equal(data.reply_markup.inline_keyboard[0][0].text, '🌐 Saytga kirish');
+      assert(data.reply_markup.inline_keyboard[0][0].url.startsWith('https://'));
+      assert(!data.text.includes('https://'));
       menuChecked = true;
     }
-    if (data.text.includes('?type=proposal')) {
+    if (
+      data.reply_markup?.inline_keyboard?.length === 1 &&
+      data.reply_markup.inline_keyboard[0][0].url.endsWith('?type=proposal')
+    ) {
       assert(data.text.includes(invitationContent.proposal.label));
       assert(data.text.includes(creatorCredit));
+      assert(!data.text.includes('https://'));
+      assert.equal(data.reply_markup.inline_keyboard[0][0].text, '🌐 Saytga kirish');
       choiceChecked = true;
     }
     return reply({ message_id: 3 });
