@@ -11,7 +11,11 @@ async function track(action: 'view' | 'heartbeat' | 'leave') {
       body: JSON.stringify({ session, action }),
       keepalive: true,
     });
-    if (result.ok) ready = true;
+    if (result.ok) {
+      const state = (await result.json()) as { registered: boolean };
+      ready = state.registered;
+      if (!ready && action === 'heartbeat') void track('view');
+    }
   } catch {
     /* Statistics never interrupt invitation creation. */
   }
@@ -20,6 +24,9 @@ void track('view');
 setInterval(() => {
   if (!document.hidden) void track(ready ? 'heartbeat' : 'view');
 }, 25000);
+window.addEventListener('pageshow', () => {
+  if (ready) void track('heartbeat');
+});
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) void track(ready ? 'heartbeat' : 'view');
   else if (ready) void track('leave');

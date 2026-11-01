@@ -38,6 +38,9 @@ async function refresh() {
     dashboard.hidden = false;
     form.hidden = true;
     status.textContent = 'Yangilandi: ' + new Date(stats.generatedAt).toLocaleTimeString('uz-UZ');
+    element('storage-status').textContent = stats.persistent
+      ? 'Doimiy baza ulangan — jami tashriflar saqlanadi.'
+      : 'Vaqtinchalik baza: hozir yig‘ilmoqda, lekin Render restart/deployida nolga qaytishi mumkin. Doimiy baza hali ulanmagan.';
   } catch (error) {
     status.textContent = errorMessage(error);
   }

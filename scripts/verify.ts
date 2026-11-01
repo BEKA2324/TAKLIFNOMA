@@ -47,6 +47,7 @@ try {
     401,
   );
   assert.equal((await fetch(base + '/admin')).status, 200);
+  assert((await (await fetch(base)).text()).includes('/build/analytics.js'));
   const stats = async () =>
     await (
       await fetch(base + '/api/admin/stats', {
@@ -67,6 +68,7 @@ try {
   await event(sessionA, 'view', cookie);
   await event(sessionB, 'view', cookie);
   let metrics = await stats();
+  assert.equal(metrics.persistent, false);
   assert.equal(metrics.site.visits, 2);
   assert.equal(metrics.site.visitors, 1);
   assert.equal(metrics.site.online, 1);

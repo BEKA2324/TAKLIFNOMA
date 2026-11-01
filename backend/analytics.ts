@@ -4,6 +4,8 @@ import { db } from './db.ts';
 import { ApiError, json, readBody, record } from './http.ts';
 import { localDate } from '../shared/time.ts';
 import type { AnalyticsSummary } from '../shared/analytics.ts';
+import { cloudAnalytics, cloudAnalyticsEnabled } from './analytics-cloud.ts';
+import type { CloudSummary } from './analytics-cloud.ts';
 
 db.exec(`CREATE TABLE IF NOT EXISTS analytics_visitors(id TEXT PRIMARY KEY,first_seen INTEGER,last_seen INTEGER);
  CREATE TABLE IF NOT EXISTS analytics_sessions(id TEXT PRIMARY KEY,visitor TEXT,last_seen INTEGER,active INTEGER);
@@ -14,16 +16,22 @@ db.exec(`CREATE TABLE IF NOT EXISTS analytics_visitors(id TEXT PRIMARY KEY,first
 const day = (time: number) => localDate(time, 'Asia/Tashkent').slice(0, 10);
 const count = (sql: string, ...params: (string | number)[]) =>
   Number(db.prepare(sql).get(...params)?.n || 0);
-export function recordBotUser(id: number) {
+export async function recordBotUser(id: number) {
   const now = Date.now();
   db.prepare(
     'INSERT INTO analytics_bot_users VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET last_seen=excluded.last_seen',
   ).run(String(id), now, now);
+  if (cloudAnalyticsEnabled())
+    try {
+      await cloudAnalytics('bot', String(id));
+    } catch {
+      console.error('Bot statistikasi doimiy bazaga yozilmadi.');
+    }
 }
-export function analyticsSummary(): AnalyticsSummary {
+export async function analyticsSummary(): Promise<AnalyticsSummary> {
   const now = Date.now(),
     today = day(now);
-  return {
+  const summary: AnalyticsSummary = {
     site: {
       visits: count('SELECT SUM(views) n FROM analytics_daily'),
       visitors: count('SELECT COUNT(*) n FROM analytics_visitors'),
@@ -46,6 +54,18 @@ export function analyticsSummary(): AnalyticsSummary {
     invitations: count('SELECT COUNT(*) n FROM invitations'),
     generatedAt: new Date(now).toISOString(),
   };
+  if (cloudAnalyticsEnabled()) {
+    try {
+      const remote = await cloudAnalytics<CloudSummary>('summary');
+      summary.site = remote.site;
+      summary.bot = { ...summary.bot, ...remote.bot };
+    } catch {
+      throw new ApiError('Doimiy statistika bazasi vaqtincha ishlamayapti', 503);
+    }
+  }
+  summary.persistent =
+    cloudAnalyticsEnabled() || Boolean(process.env.ANALYTICS_PERSISTENT_DISK === 'true');
+  return summary;
 }
 function authorized(header: string | undefined) {
   const expected = process.env.ADMIN_TOKEN;
@@ -63,7 +83,7 @@ export async function handleAnalytics(
   if (req.method === 'GET' && url.pathname === '/api/admin/stats') {
     if (!process.env.ADMIN_TOKEN) throw new ApiError('ADMIN_TOKEN serverda sozlanmagan', 503);
     if (!authorized(req.headers.authorization)) throw new ApiError('Admin kaliti noto‘g‘ri', 401);
-    json(res, 200, analyticsSummary());
+    json(res, 200, await analyticsSummary());
     return true;
   }
   if (req.method !== 'POST' || url.pathname !== '/api/analytics') return false;
@@ -113,6 +133,25 @@ export async function handleAnalytics(
     db.prepare('DELETE FROM analytics_sessions WHERE last_seen<?').run(now - 172800000);
     lastCleanup = now;
   }
-  json(res, 200, { ok: true });
+  let registered = Boolean(
+    count(
+      'SELECT COUNT(*) n FROM analytics_sessions WHERE id=? AND visitor=?',
+      body.session,
+      visitor,
+    ),
+  );
+  if (cloudAnalyticsEnabled()) {
+    try {
+      const remote = await cloudAnalytics<{ registered: boolean }>(
+        body.action as 'view' | 'heartbeat' | 'leave',
+        visitor,
+        body.session,
+      );
+      registered = remote.registered;
+    } catch {
+      throw new ApiError('Tashrifni doimiy bazaga yozib bo‘lmadi', 503);
+    }
+  }
+  json(res, 200, { ok: true, registered });
   return true;
 }

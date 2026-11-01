@@ -1,4 +1,5 @@
 export interface AnalyticsSummary {
+  persistent?: boolean;
   site: {
     visits: number;
     visitors: number;

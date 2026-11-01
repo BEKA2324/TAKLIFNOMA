@@ -134,7 +134,7 @@ export async function runBot() {
       for (const update of updates) {
         try {
           const m = update.message;
-          if (m && m.chat.id > 0) recordBotUser(m.chat.id);
+          if (m && m.chat.id > 0) await recordBotUser(m.chat.id);
           if (m?.text) {
             if (m.text === '/id') {
               await send(m.chat.id, `Telegram ID: ${m.chat.id}\n\n${creatorCredit}`);
@@ -144,7 +144,7 @@ export async function runBot() {
               if (String(m.chat.id) !== process.env.ADMIN_TELEGRAM_ID)
                 await send(m.chat.id, 'Statistika faqat sayt egasiga ochiq.');
               else {
-                const stats = analyticsSummary();
+                const stats = await analyticsSummary();
                 await send(
                   m.chat.id,
                   `📊 Luma statistikasi\n\nSaytda hozir: ${stats.site.online}\nJami tashriflar: ${stats.site.visits}\nAlohida brauzerlar: ${stats.site.visitors}\nBugungi tashriflar: ${stats.site.todayVisits}\n\nBot foydalanuvchilari: ${stats.bot.users}\nBotda bugun faol: ${stats.bot.today}\nOxirgi 24 soatda faol: ${stats.bot.recent}\nEslatma obunachilari: ${stats.bot.subscribers}\n\nBotdagi faollik xabarlar bo‘yicha; Telegram onlayn holati emas.\n${creatorCredit}`,

@@ -80,6 +80,10 @@ esbuild frontendni kichraytiradi, umumiy kodni ajratadi va Three.js’ni kapalak
 
 ## Statistika
 
+Render bepul rejasida doimiy jami hisob uchun tashqi Supabase bazasi qo‘llab-quvvatlanadi. O‘zingizning loyihangizda `database/analytics.sql` ni SQL Editor’da bajaring, Render Environment’da `SUPABASE_URL` va `SUPABASE_SECRET_KEY` ni sozlang. Kalit server uchun secret key yoki eski service-role kaliti bo‘lishi kerak; publishable/anon kalit mos kelmaydi. Kalitni kod, frontend yoki GitHub’ga yozmang. Jadvallar RLS bilan yopiq, statistik RPC faqat service_role uchun ochiq.
+
+Baza ulanganidan so‘ng sayt tashriflari va bot foydalanuvchilari haqidagi jami/bir kunlik hisoblar Render restartidan mustaqil saqlanadi. Taklifnomalar va eslatma obunalari hozircha lokal SQLite’da qoladi. Avvalgi lokal statistika avtomatik ko‘chirilmaydi; mavjud ma’lumotlarni ko‘chirish deploydan oldin alohida bajariladi. Supabase ulanmagan bo‘lsa, avvalgi vaqtinchalik hisob ishlaydi va panelda bu ochiq yoziladi. Baza ulanishi buzilsa, panel yolg‘on nol ko‘rsatish o‘rniga xato chiqaradi.
+
 Saytning `/admin` sahifasida jami sahifa ochilishlari, cookie bo‘yicha alohida brauzerlar, bugungi tashriflar, so‘nggi 90 soniyada faol brauzerlar, taklifnomalar va bot foydalanuvchilari ko‘rsatiladi. Bir brauzerning bir nechta oynasi faol brauzerlar hisobida takrorlanmaydi. Raqamlar taxminiy: cookie o‘chirish, boshqa qurilma yoki boshqa brauzer yangi tashrifchi sifatida hisoblanadi. Shaxsiy IP/manzil yoki foydalanuvchi ismi statistikada saqlanmaydi.
 
 `ADMIN_TOKEN` serverdagi admin kaliti. Lokal kalit `.env` faylida; Render uni `render.yaml` orqali avtomatik yaratadi. Render xizmatining **Environment** bo‘limidan kalitni oling va `/admin` sahifasiga kiriting. Kalit URL yoki GitHub’ga yozilmaydi, brauzerda faqat joriy sahifa xotirasida turadi. Panel 15 soniyada yangilanadi.
