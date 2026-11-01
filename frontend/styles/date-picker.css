@@ -1,0 +1,307 @@
+.date-trigger {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: 100%;
+  min-height: 50px;
+  margin-top: 9px;
+  padding: 12px 14px;
+  border: 1px solid #ffffff2a;
+  border-radius: 11px;
+  background: linear-gradient(130deg, #ffffff0e, #ffffff04);
+  box-shadow: inset 0 1px #ffffff14;
+  color: #c8b1d0;
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.date-trigger.has-date {
+  color: #ffecf8;
+}
+.date-trigger:hover {
+  border-color: #f0a4c870;
+  background: #ffffff0c;
+}
+.date-icon {
+  font-size: 23px;
+  color: #efb5d8;
+}
+.date-trigger > span:last-child {
+  flex: 1;
+}
+.date-dialog {
+  width: min(400px, calc(100vw - 28px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  margin: auto;
+  padding: 25px;
+  border: 1px solid #f7d2ee40;
+  border-radius: 25px;
+  background: radial-gradient(ellipse at top right, #78547766, transparent 60%), #2c1e38f5;
+  color: #faeaf7;
+  box-shadow:
+    inset 0 1px #ffffff35,
+    0 30px 100px #08031180;
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  font-family: Manrope, Arial, sans-serif;
+  scrollbar-width: thin;
+}
+.date-dialog::backdrop {
+  background: #10091b9e;
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+.date-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.date-kicker {
+  font-size: 8px;
+  letter-spacing: 1.8px;
+  color: #d1a1c2;
+}
+.date-dialog-head h2 {
+  font:
+    500 31px 'Cormorant Garamond',
+    Georgia,
+    serif;
+  line-height: 1.15;
+  margin: 8px 0 0;
+}
+.date-close,
+.date-month-nav > button {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  border: 1px solid #ffffff22;
+  background: #ffffff08;
+  color: #ecd6ef;
+  font-size: 23px;
+}
+.date-close:hover,
+.date-month-nav > button:hover {
+  background: #ffffff16;
+}
+.date-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.date-month-nav h3 {
+  font:
+    600 14px Manrope,
+    Arial,
+    sans-serif;
+  line-height: 1.5;
+  text-transform: capitalize;
+  margin: 0;
+  color: #f6e3f1;
+}
+.date-week,
+.date-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.date-week {
+  margin-bottom: 8px;
+}
+.date-week span {
+  text-align: center;
+  font-size: 10px;
+  color: #bda2c9;
+  padding: 5px 0;
+}
+.date-day {
+  min-width: 0;
+  aspect-ratio: 1;
+  min-height: 35px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  border: 1px solid transparent;
+  color: #f4e0f1;
+  background: transparent;
+  font-size: 12px;
+  position: relative;
+}
+.date-day:hover:not(:disabled) {
+  background: #f5b8dc18;
+  border-color: #edb9dc40;
+}
+.date-day.other-month {
+  color: #9a7da9;
+}
+.date-day:disabled {
+  color: #80698a;
+  opacity: 0.5;
+  cursor: default;
+}
+.date-day.today:after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #edb5d7;
+}
+.date-day.selected {
+  color: #3a223b;
+  background: linear-gradient(135deg, #ffd8e9, #e9a3d3);
+  border-color: #ffe0efb3;
+  box-shadow:
+    inset 0 1px #ffffff77,
+    0 3px 15px #e99ac22b;
+  font-weight: 700;
+}
+.date-day.selected:after {
+  background: #754869;
+}
+.date-time {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 0;
+  margin-top: 15px;
+  border-top: 1px solid #ffffff17;
+  border-bottom: 1px solid #ffffff17;
+}
+.date-time-title {
+  display: block;
+  font-size: 11px;
+  color: #f3d9eb;
+}
+.date-zone {
+  display: block;
+  font-size: 9px;
+  color: #bda2c9;
+  margin-top: 7px;
+  overflow-wrap: anywhere;
+  max-width: 150px;
+}
+.date-clock {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #d6b2ce;
+}
+.date-clock label {
+  margin: 0;
+}
+.date-clock input {
+  width: 55px;
+  min-height: 46px;
+  margin: 0;
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: #ffe4f3;
+  border-radius: 12px;
+  border-color: #edb8d542;
+  background: #ffffff07;
+  box-shadow: inset 0 1px #ffffff0d;
+}
+.date-clock input::-webkit-inner-spin-button {
+  opacity: 0.7;
+}
+.date-error {
+  font-size: 11px;
+  color: #ffc4d9;
+  line-height: 1.7;
+  margin: 12px 0;
+}
+.date-error:empty {
+  display: none;
+}
+.date-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+.date-actions button {
+  min-height: 43px;
+  padding: 10px 12px;
+  font-size: 11px;
+  border-radius: 11px;
+  color: #d8bbd7;
+  border: 1px solid #ffffff20;
+  background: #ffffff06;
+}
+.date-actions .date-apply {
+  margin-left: auto;
+  background: linear-gradient(125deg, #ffd5e8, #e8aad6);
+  color: #3c243f;
+  border-color: #ffe5f391;
+  padding-left: 22px;
+  padding-right: 22px;
+  font-weight: 700;
+  box-shadow: inset 0 1px #fff8;
+}
+.date-dialog button:focus-visible,
+.date-dialog input:focus-visible {
+  outline: 2px solid #f3bbdc;
+  outline-offset: 2px;
+}
+@media (max-width: 480px) {
+  .date-trigger {
+    font-size: 14px;
+    min-height: 52px;
+  }
+  .date-dialog {
+    padding: 20px;
+    border-radius: 22px;
+  }
+  .date-day {
+    min-height: 38px;
+    font-size: 13px;
+  }
+  .date-dialog-head h2 {
+    font-size: 30px;
+  }
+  .date-actions button {
+    min-height: 46px;
+  }
+  .date-clock input {
+    font-size: 20px;
+    min-height: 48px;
+  }
+  .date-zone {
+    max-width: 128px;
+  }
+}
+@media (max-width: 350px) {
+  .date-dialog {
+    padding: 15px;
+  }
+  .date-day {
+    min-height: 33px;
+  }
+  .date-week,
+  .date-grid {
+    gap: 3px;
+  }
+  .date-actions {
+    gap: 5px;
+  }
+  .date-actions button {
+    padding: 10px;
+    font-size: 10px;
+  }
+  .date-time {
+    gap: 8px;
+  }
+}

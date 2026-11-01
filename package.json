@@ -1,0 +1,29 @@
+{
+  "name": "luma-invitations",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "npm run build && node --env-file-if-exists=.env backend/server.ts",
+    "dev": "npm run build && node --watch --env-file-if-exists=.env backend/server.ts",
+    "build": "node scripts/build.ts",
+    "check": "tsc --noEmit && node scripts/check-source.ts",
+    "test": "npm run build && node scripts/verify.ts && node scripts/verify-bot.ts && node scripts/verify-butterflies.ts",
+    "format": "prettier --write \"{backend,frontend,shared,scripts}/**/*.{ts,css}\""
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^1.1.0",
+    "three": "^0.187.0"
+  },
+  "devDependencies": {
+    "@types/leaflet": "^1.9.22",
+    "@types/node": "^26.6.6",
+    "@types/three": "^0.187.0",
+    "esbuild": "^0.28.2",
+    "prettier": "^3.9.10",
+    "typescript": "^7.0.2"
+  }
+}

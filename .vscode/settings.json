@@ -1,0 +1,5 @@
+{
+  "files.exclude": { "**/node_modules": true, "public/build": true },
+  "search.exclude": { "**/node_modules": true, "public/build": true, "data": true },
+  "editor.formatOnSave": true
+}

@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="uz">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#21112f" />
+    <title>Luma — yurakdan taklif</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/build/app.css" />
+  </head>
+  <body>
+    <div class="flower-backdrop" aria-hidden="true">
+      <div class="flower flower-one"></div>
+      <div class="flower flower-two"></div>
+    </div>
+    <div id="butterfly-layer" aria-hidden="true" hidden></div>
+    <button
+      id="butterfly-toggle"
+      class="butterfly-toggle"
+      type="button"
+      aria-pressed="false"
+      aria-controls="butterfly-layer"
+    >
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M12 17C3 23 0 5 4 4c3-1 6 5 8 9 2-4 5-10 8-9 4 1 1 19-8 13Z"
+          stroke="currentColor"
+          stroke-width="1.3"
+        />
+        <path
+          d="M12 10v10m0-9L9 7m3 4 3-4"
+          stroke="currentColor"
+          stroke-width="1.3"
+          stroke-linecap="round"
+        /></svg
+      ><span>Kapalaklarni ko‘rsatish</span>
+    </button>
+    <p id="butterfly-status" class="sr-only" role="status"></p>
+    <header>
+      <a class="logo" href="/">luma<span>✦</span></a
+      ><span class="header-note">Kichik taklif. Katta hislar.</span
+      ><a class="nav-button" href="#studio">Taklif yaratish ↗</a>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="intro">
+          <span class="eyebrow">HISLARINGIZGA CHIROYLI SHAKL BERING</span>
+          <h1>Ba’zi so‘zlar<br /><em>yurakdan</em><br />boshlanadi.</h1>
+          <p>
+            Uchrashuv, unutilmas bayram yoki bir umrga taklif.<br />O‘zingizning kichik sevgi
+            hikoyangizni yarating.
+          </p>
+          <a class="primary" href="#studio">Mening taklifnomam <span>↗</span></a>
+          <div class="hero-foot"><span>♡ Shaxsan sizdan</span><span>✦ Faqat u uchun</span></div>
+        </div>
+        <div class="heart-scene">
+          <div class="orbit orbit-one"></div>
+          <div class="orbit orbit-two"></div>
+          <span class="float-note note-one">you + me</span
+          ><canvas
+            id="heart"
+            aria-label="Mayda qizil zarralardan tashkil topgan interaktiv yurak"
+          ></canvas
+          ><span class="float-note note-two">a little more love ♡</span>
+          <div class="heart-caption">
+            <span class="dot"></span> YURAKKA YAQINROQ KELING<span
+              >Kursorni yurak ustiga olib boring</span
+            >
+          </div>
+        </div>
+      </section>
+      <section id="studio">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">SIZNING HIKOYANGIZ</span>
+            <h2>Bir taklifdan boshlaymiz.</h2>
+          </div>
+          <span class="step">01 / YARATISH</span>
+        </div>
+        <div class="studio-grid">
+          <div class="editor">
+            <div class="tabs" role="group" aria-label="Taklif turi">
+              <button class="active" data-type="date">♡ Uchrashuv</button
+              ><button data-type="proposal">♢ Turmush taklifi</button
+              ><button data-type="apology">❀ Kechirim</button
+              ><button data-type="custom">✦ Boshqa</button>
+            </div>
+            <form id="form">
+              <div class="two">
+                <label
+                  >Sizning ismingiz<input
+                    id="sender"
+                    maxlength="80"
+                    placeholder="Masalan, Aziz"
+                    required /></label
+                ><label
+                  >Kim uchun?<input
+                    id="recipient"
+                    maxlength="80"
+                    placeholder="Masalan, Madina"
+                    required
+                /></label>
+              </div>
+              <label
+                >Yurakdagi savol<input
+                  id="title"
+                  maxlength="150"
+                  value="Men bilan uchrashuvga chiqasanmi?"
+                  required /></label
+              ><label
+                >Samimiy so‘zlar<textarea id="message" maxlength="1500" rows="3">
+Bir oqshom, ikki finjon qahva va sen bilan cheksiz suhbat. Bu lahzani birga yarataylik.</textarea>
+              </label>
+              <div class="two">
+                <label
+                  >Qachon? <small id="date-hint">(tanlangan mintaqa vaqti)</small
+                  ><input id="date" type="datetime-local" required /></label
+                ><label
+                  >Qayerda?<input
+                    id="place"
+                    maxlength="200"
+                    placeholder="Sevimli qahvaxonamiz"
+                    required
+                /></label>
+              </div>
+              <label
+                >Vaqt mintaqasi<select id="timezone" aria-label="Uchrashuv vaqt mintaqasi"></select
+              ></label>
+              <details class="map-picker">
+                <summary>⌖ Xaritadan uchrashuv joyini tanlash <span>↗</span></summary>
+                <div class="map-content">
+                  <p>Istalgan shaharni qidiring yoki xaritada kerakli nuqtaga teging.</p>
+                  <div class="map-search">
+                    <input
+                      id="map-query"
+                      placeholder="Samarqand, Paris, Istanbul…"
+                      maxlength="160"
+                      aria-label="Shahar yoki manzil"
+                    /><button id="map-search" type="button">Qidirish</button>
+                  </div>
+                  <div id="map-results" aria-live="polite"></div>
+                  <div id="map" aria-label="Uchrashuv joyini tanlash xaritasi"></div>
+                  <div class="map-tools">
+                    <button id="locate" type="button">◎ Mening joylashuvim</button
+                    ><button id="clear-location" type="button">Nuqtani o‘chirish</button>
+                  </div>
+                  <p id="map-status" role="status">Hali nuqta tanlanmagan.</p>
+                  <small
+                    >©
+                    <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener"
+                      >OpenStreetMap</a
+                    >
+                    · Qidiruv: Nominatim</small
+                  >
+                </div>
+              </details>
+              <button class="primary submit" type="submit">
+                Taklifnomani yaratish <span>↗</span>
+              </button>
+              <p class="form-note">Havolani oling, ulashing va uning javobini kuting.</p>
+            </form>
+            <div id="result" hidden>
+              <p>Taklifnomangiz tayyor ♡</p>
+              <input id="share-url" readonly aria-label="Taklifnoma havolasi" />
+              <div class="result-actions">
+                <button id="copy">Havolani nusxalash</button
+                ><a id="creator-bot" hidden target="_blank" rel="noopener"
+                  >Botdan maktubni olish ↗</a
+                ><a id="download-paper" hidden download="luma-taklifnoma.png">PNG yuklash ↓</a
+                ><a id="open-invite" target="_blank" rel="noopener">Ochish ↗</a>
+              </div>
+            </div>
+            <p id="status" role="status"></p>
+          </div>
+          <div class="preview-wrap">
+            <div class="preview-label"><span>JONLI KO‘RINISH</span><span>✦</span></div>
+            <article class="invitation" id="card">
+              <div class="card-art" id="card-art">
+                <span class="mini-heart">♥</span
+                ><img
+                  id="proposal-image"
+                  hidden
+                  src="https://images.pexels.com/photos/28887370/pexels-photo-28887370.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  alt="Qizil atirgul guldastasi ustidagi nikoh uzugi"
+                />
+              </div>
+              <span class="card-eyebrow" id="for-you">FAQAT SEN UCHUN</span>
+              <h3 id="preview-title">Men bilan uchrashuvga chiqasanmi?</h3>
+              <p id="preview-message">
+                Bir oqshom, ikki finjon qahva va sen bilan cheksiz suhbat. Bu lahzani birga
+                yarataylik.
+              </p>
+              <div class="details">
+                <span id="preview-date">♡ Unutilmas bir kun</span
+                ><span id="preview-place">⌖ Bizning sevimli joyimiz</span>
+              </div>
+              <a id="map-link" class="map-link" hidden target="_blank" rel="noopener"
+                >⌖ Uchrashuv joyini xaritada ochish ↗</a
+              >
+              <div class="answer-buttons">
+                <button id="yes" type="button">Ha, albatta! ♡</button
+                ><button id="no" type="button">Boshqa safar</button>
+              </div>
+              <p id="answer-status" role="status"></p>
+              <span class="signature" id="signature">Mehr bilan, sizdan</span
+              ><a id="telegram" hidden target="_blank" rel="noopener">✉ Botdan maktubni olish</a>
+              <p class="bot-note" id="bot-note" hidden></p>
+            </article>
+            <p class="preview-bottom">Yaxshi hikoyalar oddiy bir “ha”dan boshlanadi.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="about-footer" id="about">
+      <div class="about-top">
+        <div class="about-brand">
+          <a class="logo" href="/">luma<span>✦</span></a>
+          <p>
+            Yurakdan yaratilgan. Yurakka yetib borsin.<br />Hislaringiz uchun taklifnomalar, samimiy
+            maktublar va bir chimdim sehr.
+          </p>
+          <span class="creator-tag">SAYT YARATUVCHISI · BEKA</span>
+        </div>
+        <div class="about-contact">
+          <h2>Biz haqimizda</h2>
+          <div class="social-links">
+            <a
+              href="https://www.instagram.com/beka_winnn/"
+              target="_blank"
+              rel="noopener noreferrer"
+              ><small>Instagram ↗</small><span>@beka_winnn</span></a
+            ><a href="https://t.me/BEKA_XX1" target="_blank" rel="noopener noreferrer"
+              ><small>Telegram ↗</small><span>@BEKA_XX1</span></a
+            ><a href="https://github.com/beka2324" target="_blank" rel="noopener noreferrer"
+              ><small>GitHub ↗</small><span>beka2324</span></a
+            ><a href="tel:+998976289911"
+              ><small>Bog‘lanish ↗</small><span>+998 97 628 99 11</span></a
+            >
+          </div>
+        </div>
+      </div>
+      <div class="about-bottom">
+        <span>BEKA bilan yaratilgan · Mehr bilan ulashing ♡</span>
+        <div class="asset-credits">
+          <a
+            href="https://sketchfab.com/3d-models/fantasy-butterfly-animation-0f24b085e8654e4db09c2fe681a79e3f"
+            target="_blank"
+            rel="noopener noreferrer"
+            >3D model: lunequinox</a
+          ><a
+            href="https://creativecommons.org/licenses/by/4.0/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >CC BY 4.0</a
+          ><a
+            href="https://www.pexels.com/photo/pink-flowers-on-dark-background-6434293/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Gullar: Pexels</a
+          >
+        </div>
+      </div>
+    </footer>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module" src="/build/app.js"></script>
+    <script type="module" src="/build/effects.js"></script>
+  </body>
+</html>
